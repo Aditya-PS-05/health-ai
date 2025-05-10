@@ -26,20 +26,17 @@ export default function LoginModal() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-2xl">Welcome to QuickChat</DialogTitle>
-          <DialogDescription>
-            Welcome to MergMetrics
-          </DialogDescription>
+          <DialogTitle className="text-2xl">Welcome to HeathAI</DialogTitle>
         </DialogHeader>
-        <Button variant="outline" onClick={handleGithubLogin}>
+        <Button variant="outline" onClick={handleGithubLogin} className="hover:bg-black hover:text-white w-full flex justify-center items-center">
+          Continue with Github
           <Image
-            src="/images/google.png"
+            src="/images/github.png"
             className=" mr-4"
             width={25}
             height={25}
             alt="google"
           />
-          Continue with Github
         </Button>
       </DialogContent>
     </Dialog>
