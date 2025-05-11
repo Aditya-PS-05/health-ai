@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { Input } from "@repo/ui/components/ui/input";
-import { Button } from "@repo/ui/components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
 
 export default function Footer() {
   return (

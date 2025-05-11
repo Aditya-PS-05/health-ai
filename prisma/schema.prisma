@@ -14,13 +14,107 @@ datasource db {
 }
 
 model User {
-  id         Int         @id @default(autoincrement())
-  name       String      @db.VarChar(191)
-  email      String      @unique @db.VarChar(191)
-  provider   String      @db.VarChar(100)
-  image      String?
-  oauth_id   String
-  created_at DateTime    @default(now())
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar(191)
+  email         String          @unique @db.VarChar(191)
+  provider      String          @db.VarChar(100)
+  image         String?
+  oauth_id      String
+  created_at    DateTime        @default(now())
+  documents     Document[] // Relation to user's documents
+  analyses      Analysis[] // Relation to analyses
+  HealthInsight HealthInsight[]
 
   @@map("users")
+}
+
+model Document {
+  id      Int  @id @default(autoincrement())
+  user_id Int // Foreign key to User
+  user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // File details
+  original_filename String @db.VarChar(255)
+  file_id           String @unique @db.VarChar(255) // Unique ID generated for the file (UUID)
+  file_size         Int // Size in bytes
+  mime_type         String @db.VarChar(100)
+  file_extension    String @db.VarChar(50)
+
+  // Storage details
+  storage_path   String  @db.Text // Path in MinIO bucket
+  storage_bucket String  @db.VarChar(100)
+  public_url     String? @db.Text // Presigned or public URL (optional)
+
+  // Metadata
+  uploaded_at DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  is_deleted  Boolean   @default(false)
+  deleted_at  DateTime? // Soft delete tracking
+
+  // Document type and categorization
+  document_type String?  @db.VarChar(100) // e.g., "lab_report", "prescription", "medical_history"
+  tags          String[] // Array of tags for categorization
+
+  // Relations
+  analyses Analysis[] // Relation to analyses performed on this document
+
+  @@index([user_id])
+  @@index([file_id])
+  @@index([document_type])
+  @@map("documents")
+}
+
+model Analysis {
+  id          Int      @id @default(autoincrement())
+  user_id     Int // Foreign key to User
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  document_id Int // Foreign key to Document
+  document    Document @relation(fields: [document_id], references: [id], onDelete: Cascade)
+
+  // Analysis details
+  status  String  @db.VarChar(50) // "pending", "processing", "completed", "failed"
+  result  Json? // JSON object containing the analysis results
+  summary String? @db.Text
+
+  // Timestamps
+  created_at   DateTime  @default(now())
+  completed_at DateTime?
+
+  // Analysis metadata
+  analysis_type String  @db.VarChar(100) // Type of analysis performed
+  version       String  @db.VarChar(50) // Version of the AI model used
+  error_message String? @db.Text // If analysis failed
+
+  @@index([user_id])
+  @@index([document_id])
+  @@index([status])
+  @@map("analyses")
+}
+
+// Optional: For storing AI-generated health insights and recommendations
+model HealthInsight {
+  id      Int  @id @default(autoincrement())
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // Insight details
+  title          String @db.VarChar(255)
+  description    String @db.Text
+  recommendation String @db.Text
+  priority_level String @db.VarChar(50) // "low", "medium", "high"
+
+  // Source tracking
+  source_analyses Int[] // IDs of analyses that contributed to this insight
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // User interaction
+  is_read     Boolean   @default(false)
+  is_actioned Boolean   @default(false)
+  actioned_at DateTime?
+
+  @@index([user_id])
+  @@map("health_insights")
 }

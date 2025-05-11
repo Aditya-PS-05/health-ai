@@ -11,7 +11,7 @@ export default async function dashboard() {
       <div>
         <h1>Welcome! {session?.user?.name}</h1>
 
-        <UploadPage />
+        <UploadPage user={session?.user!} />
       </div>
     </div>
   );

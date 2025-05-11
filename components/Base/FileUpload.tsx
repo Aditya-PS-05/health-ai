@@ -1,6 +1,7 @@
 // components/FileUpload.tsx
 'use client';
 
+import { CustomUser } from '@/app/api/auth/[...nextauth]/options';
 import { useState, useRef } from 'react';
 
 interface UploadedFile {
@@ -10,7 +11,7 @@ interface UploadedFile {
   path: string;
 }
 
-export default function FileUpload() {
+export default function FileUpload({ user }: { user: CustomUser | null }) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -77,6 +78,8 @@ export default function FileUpload() {
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
+      formData.append('userId', user?.id!);
+      console.log(formData);
       
       // Add user ID if available (from auth system)
       // formData.append('userId', 'user123');

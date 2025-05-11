@@ -1,6 +1,7 @@
+import { CustomUser } from '@/app/api/auth/[...nextauth]/options';
 import FileUpload from './FileUpload';
 
-export default function UploadPage() {
+export default function UploadPage({user}: {user: CustomUser | null}) {
   return (
     <main className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
@@ -15,7 +16,7 @@ export default function UploadPage() {
           </p>
         </div>
         
-        <FileUpload />
+        <FileUpload user={user} />
         
         <div className="mt-16 max-w-3xl mx-auto">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">How It Works</h2>
